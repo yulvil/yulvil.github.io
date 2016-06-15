@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<script>
+
+key = "";
+handle = "";
+
+function run() {
+	document.getElementById("console").innerHTML = ""
+	var elem = document.getElementById("secretkey");
+	key = elem.value;
+	elem.value = "";
+	handle = this.setInterval(this.updateState, 1000);
+	this.setTimeout(stop, 45 * 1000);
+}
+function updateState() {
+	// { "secretKey": "AAAABBBBCCCCDDDD", "validationCode": "123456", "expires" : 28 }
+	var s = JSON.parse(agol.Totp(key));
+	if (document.getElementById("code").innerHTML != "Code: " + s.validationCode) {
+		document.getElementById("code").innerHTML = "Code: " + s.validationCode;
+	}
+	document.getElementById("expires").innerHTML = "Expires: " + s.expires;
+}
+function stop() {
+	clearInterval(handle);	
+	document.getElementById("console").innerHTML = "Done"
+}
+</script>
+<body>
+<h3>Time-based One-time Password (TOTP)</h3>
+<form name="myform" id="myform" method="post" action="javascript:void(0);" onsubmit="run(this); return false;">
+<label labelFor="portal">Secret Key</label>
+<input type="text" name="secretkey" id="secretkey" size="64" value="AAAABBBBCCCCDDDD" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"><br /><br />
+Run for <input type="text" name="secs" id="secs" size="3" value="45"> secs
+<input type="submit" name="submit" id="submit" value="Get Code">
+</form>
+
+<br />
+<div id="code"> </div><br />
+<div id="expires"> </div><br />
+<div id="console"> </div><br />
+<script src="totpjs.js"> </script>
+<div><a href="https://github.com/yulvil/totpjs/tree/master/">Source Code</a></div>
+</body>
+</html>

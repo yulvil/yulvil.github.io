@@ -529,7 +529,7 @@ function filterData(segments, includekits, excludekits, minCm, maxCm) {
 
 	var d = segments;
 
-	if (includekits.length > 0) {
+	if (includekits && includekits.length > 0) {
 		d = d.filter(e => includekits.includes(e.kitTo));
 	}
 
@@ -537,7 +537,7 @@ function filterData(segments, includekits, excludekits, minCm, maxCm) {
 
 	d = d.filter(e => e.cm <= maxCm);
 
-	if (excludekits.length > 0) {
+	if (excludekits && excludekits.length > 0) {
 		d = d.filter(e => !excludekits.includes(e.kitTo));
 	}
 

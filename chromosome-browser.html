@@ -163,15 +163,15 @@ nav {
     <br/><br/>
     <label for="csvdata0">CSV Data</label>
     <br/>
-    <textarea name="csvdata0" id="csvdata0" class="csvdata" onChange="loadData();updateAll();"></textarea>
+    <textarea name="csvdata0" id="csvdata0" class="csvdata" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onChange="loadData();updateAll();"></textarea>
   </div>
 </div>
 
 </div>
 <div class="inputs" id="filters">
 <label for="minCm">Centimorgan size</label>
-from <input id="minCm" type="number" value="10" onChange="updateAll();" onInput="updateAll();">
-to <input id="maxCm" type="number" value="" onChange="updateAll();" onInput="updateAll();">
+from <input id="minCm" type="number" value="10" onChange="updateCm();" onInput="updateCm();">
+to <input id="maxCm" type="number" value="" onChange="updateCm();" onInput="updateCm();">
 
 <br/><br/>
 <label for="includekits">Only show these kits (one per line)</label>
@@ -430,10 +430,8 @@ function csvParse(text) {
 		e.start =  + (d.start || d.Start || d["START LOCATION"] || d["Start Location"] || d["Chromosome Start Point"] || "0").replace(/,/g, "");
 		e.end =  + (d.end || d.End || d["END LOCATION"] || d["End Location"] || d["Chromosome End Point"] || "0").replace(/,/g, "");
 		e.cm =  + (d.cm || d.cM || d["CENTIMORGANS"] || d["Centimorgans"] || d["Genetic Distance"] || "0").replace(/,/g, "");
-		e.kitTo = d.kit2 || d.matchname || d.Match || d["MATCHNAME"] || d["Match name"] || d["Display Name"] || "";
+		e.kitTo = d.kit2 || d.matchname || d.Match || d["MATCHNAME"] || d["Match name"] || d["Match Name"] || d["Display Name"] || "";
 		e.side = getSide(d);
-
-console.log(e);
 
 		if (!kits[e.kitFrom]) {
 			var nameFrom = (d.name1 || d.name || d.NAME || d.Name || "");
@@ -666,6 +664,26 @@ function getChrBoxWidth(chr, chrsize) {
 	return width;
 }
 
+function updateCm() {
+	let minCm = +document.getElementById("minCm").value || 10;
+	document.getElementById("minCm").value = minCm;
+
+	let maxCm = +document.getElementById("maxCm").value || "";
+	document.getElementById("maxCm").value = maxCm;
+
+	var params = new URLSearchParams(location.search);
+	if (params.has("minCm") || minCm != 10) {
+		params.set("minCm", minCm);
+	}
+	if (params.has("maxCm") || maxCm !== "") {
+		params.set("maxCm", maxCm);
+	}
+
+	window.history.replaceState({}, '', `${location.pathname}?${params}${window.location.hash}`);
+
+	updateAll();
+}
+
 function updateAll() {
 	updateData()
 	updateDisplay()
@@ -877,6 +895,16 @@ function pageLoad() {
 	} else {
 		var params = new URLSearchParams(location.search);
 		urls = params.getAll("url");
+
+		let minCm = +params.get("minCm");
+		if (minCm > 0 && minCm < 200) {
+			document.getElementById("minCm").value = minCm;
+		}
+
+		let maxCm = +params.get("maxCm");
+		if (maxCm > 0 && maxCm < 200) {
+			document.getElementById("maxCm").value = maxCm;
+		}
 	}
 
 	if (urls.length > 0) {
